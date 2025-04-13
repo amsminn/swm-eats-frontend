@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Providers } from "@/components/providers"
 import { MapProvider } from "@/contexts/MapContext"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,6 +30,7 @@ export default function RootLayout({
             </footer>
           </Providers>
         </MapProvider>
+        <Toaster />
       </body>
     </html>
   )
