@@ -143,7 +143,7 @@ export function KakaoMap({
         setIsError(true)
         setIsLoading(false)
       }
-    }, 500) // 지연 시간 500ms
+    }, 1000) // 지연 시간 1000ms
 
     return () => clearTimeout(initMapTimer)
   }, [isKakaoLoaded, isInitialized, renderCount, mapInstance, latitude, longitude, name, address])

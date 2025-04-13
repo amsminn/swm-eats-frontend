@@ -12,10 +12,15 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
+    // Early return if window is not available (SSR)
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     console.log("MapProvider useEffect triggered")
     
     // Check if script is already loaded
-    if (typeof window !== 'undefined' && window.kakao && window.kakao.maps) {
+    if (window.kakao && window.kakao.maps) {
       console.log('Kakao Maps API is already loaded')
       setIsKakaoLoaded(true)
       setIsInitialized(true)
@@ -65,7 +70,8 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const searchAddress = useCallback(async (address: string): Promise<Address | null> => {
-    if (!isKakaoLoaded || !isInitialized) {
+    // Early return if window is not available (SSR) or Kakao API not initialized
+    if (typeof window === 'undefined' || !isKakaoLoaded || !isInitialized) {
       console.error('Kakao Maps API is not fully initialized yet')
       return null
     }

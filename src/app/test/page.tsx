@@ -1,7 +1,16 @@
 "use client"
 
-import { MapTest } from "@/components/MapTest"
-import MapContainer from "@/components/MapContainer"
+import dynamic from 'next/dynamic'
+
+// Dynamically import components that use window/browser APIs with SSR disabled
+const DynamicMapTest = dynamic(
+  () => import('@/components/MapTest').then((mod) => mod.MapTest),
+  { ssr: false }
+)
+const DynamicMapContainer = dynamic(
+  () => import('@/components/MapContainer'),
+  { ssr: false }
+)
 
 export default function TestPage() {
   return (
@@ -12,7 +21,7 @@ export default function TestPage() {
         {/* API 상태 테스트 */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">API 상태 확인</h2>
-          <MapTest />
+          <DynamicMapTest />
         </div>
 
         {/* 지도 렌더링 테스트 */}
@@ -23,7 +32,7 @@ export default function TestPage() {
               {/* 기본 지도 */}
               <div>
                 <h3 className="font-medium mb-2">기본 지도</h3>
-                <MapContainer 
+                <DynamicMapContainer 
                   center={{ lat: 37.5665, lng: 126.9780 }}
                   height="300px"
                 />
@@ -32,7 +41,7 @@ export default function TestPage() {
               {/* 마커가 있는 지도 */}
               <div>
                 <h3 className="font-medium mb-2">마커 테스트</h3>
-                <MapContainer 
+                <DynamicMapContainer 
                   center={{ lat: 37.5665, lng: 126.9780 }}
                   markers={[
                     {
