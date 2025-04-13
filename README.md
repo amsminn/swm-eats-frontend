@@ -11,7 +11,7 @@
 - **인증:** JWT, NextAuth.js
 - **배포:** Vercel(프론트엔드), AWS/Vercel(백엔드)
 
-## 시작하기
+## 설치 및 실행 방법
 
 1. 저장소 클론:
    ```bash
@@ -22,14 +22,42 @@
 2. 의존성 설치:
    ```bash
    npm install
+   # 또는
+   yarn
    ```
 
-3. 개발 서버 실행:
+3. 환경 변수 설정:
+   `.env.local` 파일에 필요한 환경 변수를 설정하세요.
+   ```
+   NEXT_PUBLIC_KAKAO_MAP_API_KEY=여기에_카카오맵_JAVASCRIPT_API_키를_입력하세요
+   NEXT_PUBLIC_API_URL=http://localhost:3001/api
+   ```
+
+4. 개발 서버 실행:
    ```bash
    npm run dev
+   # 또는
+   yarn dev
    ```
 
-4. 브라우저에서 http://localhost:3000 접속
+5. 브라우저에서 http://localhost:3000 접속
+
+## 카카오맵 설정 방법
+
+1. [Kakao Developers](https://developers.kakao.com/) 에서 계정 생성 및 로그인
+2. 애플리케이션 추가 및 JavaScript API 키 발급
+3. 웹 플랫폼 등록: 설정 > 플랫폼 > Web 플랫폼 등록
+   - 사이트 도메인에 `http://localhost:3000` 추가
+4. `.env.local` 파일에 발급받은 JavaScript API 키 입력
+5. API 유형 중 '카카오맵' API가 활성화되어 있는지 확인
+
+## 문제 해결
+
+### 지도가 표시되지 않는 경우
+- 브라우저 콘솔에서 오류 메시지 확인
+- JavaScript API 키가 올바르게 설정되었는지 확인
+- Kakao Developers에서 도메인이 등록되었는지 확인
+- https 환경에서 실행 중인 경우, 카카오맵 SDK URL도 https로 변경 필요
 
 ## 주요 기능
 

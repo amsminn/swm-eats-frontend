@@ -8,6 +8,7 @@ import { useState } from "react"
 const navigation = [
   { name: "홈", href: "/" },
   { name: "맛집 탐색", href: "/restaurants" },
+  { name: "리뷰 목록", href: "/reviews" },
   { name: "내 프로필", href: "/profile" },
 ]
 

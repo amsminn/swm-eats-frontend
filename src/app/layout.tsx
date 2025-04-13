@@ -2,6 +2,7 @@ import "@/styles/globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Providers } from "@/components/providers"
+import { MapProvider } from "@/contexts/MapContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -18,14 +19,16 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <footer className="bg-gray-100 p-6 text-center text-gray-500">
-            <p>© {new Date().getFullYear()} SWM Eats. All rights reserved.</p>
-          </footer>
-        </Providers>
+        <MapProvider>
+          <Providers>
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <footer className="bg-gray-100 p-6 text-center text-gray-500">
+              <p>© {new Date().getFullYear()} SWM Eats. All rights reserved.</p>
+            </footer>
+          </Providers>
+        </MapProvider>
       </body>
     </html>
   )

@@ -34,8 +34,31 @@ async function fetchApi<T>(
     endpoint = `${endpoint}?${searchParams.toString()}`;
   }
 
+  const fullUrl = `${API_URL}${endpoint}`;
+  
+  // API 호출 시작 시 로그
+  console.log('API Request:', {
+    url: fullUrl,
+    method: config.method,
+    domain: new URL(fullUrl).hostname,
+    endpoint,
+    params: params ? Object.keys(params) : null,
+    headers: Object.keys(headers),
+    timestamp: new Date().toISOString()
+  });
+
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, config);
+    const response = await fetch(fullUrl, config);
+    
+    // API 응답 로그
+    console.log('API Response:', {
+      url: fullUrl,
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      headers: Array.from(response.headers.keys()),
+      timestamp: new Date().toISOString()
+    });
     
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -48,6 +71,12 @@ async function fetchApi<T>(
 
     return await response.json();
   } catch (error) {
+    // API 오류 로그
+    console.error('API Error:', {
+      url: fullUrl,
+      error: error instanceof Error ? error.message : String(error),
+      timestamp: new Date().toISOString()
+    });
     return Promise.reject(error);
   }
 }

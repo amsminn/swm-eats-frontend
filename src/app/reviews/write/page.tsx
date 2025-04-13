@@ -28,6 +28,7 @@ const MOCK_RESTAURANTS: Restaurant[] = [
     description: "소마센터 근처 맛있는 김치찌개 맛집",
     imageUrl: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9",
     rating: 4.5,
+    reviewCount: 42,
     latitude: 37.5665,
     longitude: 126.9780,
     createdAt: new Date().toISOString(),
@@ -42,6 +43,7 @@ const MOCK_RESTAURANTS: Restaurant[] = [
     description: "신선한 재료로 만든 정통 스시",
     imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c",
     rating: 4.7,
+    reviewCount: 38,
     latitude: 37.5015,
     longitude: 127.0437,
     createdAt: new Date().toISOString(),
@@ -56,6 +58,7 @@ const MOCK_RESTAURANTS: Restaurant[] = [
     description: "30년 전통의 중화요리 전문점",
     imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d",
     rating: 4.2,
+    reviewCount: 56,
     latitude: 37.5045,
     longitude: 127.0213,
     createdAt: new Date().toISOString(),
@@ -70,6 +73,7 @@ const MOCK_RESTAURANTS: Restaurant[] = [
     description: "수제 도우로 만든 정통 이탈리안 피자",
     imageUrl: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3",
     rating: 4.6,
+    reviewCount: 28,
     latitude: 37.5087,
     longitude: 127.0476,
     createdAt: new Date().toISOString(),
@@ -308,6 +312,7 @@ export default function WriteReviewPage() {
                         src={image}
                         alt={`Review image ${index + 1}`}
                         fill
+                        sizes="(max-width: 768px) 128px, 128px"
                         className="object-cover"
                       />
                     </div>

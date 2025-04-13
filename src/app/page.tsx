@@ -61,6 +61,11 @@ export default function Home() {
               </div>
             ))}
           </div>
+          <div className="flex justify-center mt-12">
+            <Link href="/reviews" className="bg-indigo-600 text-white hover:bg-indigo-700 font-semibold px-6 py-3 rounded-lg transition-colors">
+              모든 리뷰 보기
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -99,6 +104,7 @@ function FeatureCard({
           src={iconSrc}
           alt={title}
           fill
+          sizes="(max-width: 768px) 100%, (max-width: 1200px) 50%, 33%"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
       </div>

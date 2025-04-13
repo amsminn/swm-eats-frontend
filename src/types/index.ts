@@ -7,6 +7,7 @@ export interface Restaurant {
   description: string;
   imageUrl: string;
   rating: number;
+  reviewCount: number;
   latitude: number;
   longitude: number;
   createdAt: string;

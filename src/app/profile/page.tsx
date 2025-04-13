@@ -33,6 +33,7 @@ const MOCK_FAVORITES: Restaurant[] = [
     description: "소마센터 근처 맛있는 김치찌개 맛집",
     imageUrl: "/images/kimchi-stew.jpg",
     rating: 4.5,
+    reviewCount: 42,
     latitude: 37.5665,
     longitude: 126.9780,
     createdAt: new Date().toISOString(),
@@ -47,6 +48,7 @@ const MOCK_FAVORITES: Restaurant[] = [
     description: "30년 전통의 중화요리 전문점",
     imageUrl: "/images/chinese-food.jpg",
     rating: 4.2,
+    reviewCount: 56,
     latitude: 37.5045,
     longitude: 127.0213,
     createdAt: new Date().toISOString(),
@@ -131,6 +133,7 @@ export default function ProfilePage() {
               src={MOCK_USER.image}
               alt={MOCK_USER.name}
               fill
+              sizes="(max-width: 768px) 128px, 128px"
               className="object-cover"
             />
           </div>
@@ -214,6 +217,7 @@ function FavoriteCard({ restaurant }: { restaurant: Restaurant }) {
             src={restaurant.imageUrl}
             alt={restaurant.name}
             fill
+            sizes="(max-width: 768px) 100%, (max-width: 1200px) 50%, 33%"
             className="object-cover"
           />
           <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-sm font-medium flex items-center">

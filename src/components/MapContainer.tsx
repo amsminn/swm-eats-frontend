@@ -2,15 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 import { MapPin } from "lucide-react"
-import { Restaurant } from "@/types"
 import { useMap } from "@/contexts/MapContext"
 
-// 공덕역 위치 좌표
-const GONGDEOK_STATION = {
-  lat: 37.5447,
-  lng: 126.9515
-}
-
+// 카카오맵 타입 선언 - any로 대체하여 타입 충돌 방지
 declare global {
   interface Window {
     kakao: any
@@ -22,39 +16,39 @@ declare global {
   }
 }
 
-interface RestaurantsMapProps {
-  restaurants: Restaurant[]
-  height?: string
-  onSelectRestaurant?: (id: string) => void
+// 공덕역 위치 좌표
+const GONGDEOK_STATION = {
+  lat: 37.5447,
+  lng: 126.9515
 }
 
-export function RestaurantsMap({ 
-  restaurants,
-  height = "300px",
-  onSelectRestaurant
-}: RestaurantsMapProps) {
+interface MapContainerProps {
+  center?: { lat: number; lng: number };
+  markers?: Array<{
+    position: { lat: number; lng: number };
+    content?: string;
+  }>;
+  width?: string;
+  height?: string;
+  level?: number;
+  onMapLoad?: (map: any) => void;
+}
+
+export default function MapContainer({
+  center = GONGDEOK_STATION, // 공덕역 기본값
+  markers = [],
+  width = "100%",
+  height = "400px",
+  level = 5, // 더 넓은 영역 표시 (약 2km 범위)
+  onMapLoad
+}: MapContainerProps) {
+  // 상태 관리
   const mapRef = useRef<HTMLDivElement>(null)
   const [isError, setIsError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [renderCount, setRenderCount] = useState(0)
   const [mapInstance, setMapInstance] = useState<any>(null)
   const { isKakaoLoaded, isInitialized } = useMap()
-
-  // Calculate center of map from all restaurants
-  const calculateCenter = () => {
-    if (restaurants.length === 0) {
-      // Default to 공덕역 if no restaurants
-      return GONGDEOK_STATION
-    }
-    
-    const totalLat = restaurants.reduce((sum, r) => sum + r.latitude, 0)
-    const totalLng = restaurants.reduce((sum, r) => sum + r.longitude, 0)
-    
-    return {
-      lat: totalLat / restaurants.length,
-      lng: totalLng / restaurants.length
-    }
-  }
 
   // 1. 강제 리렌더링을 위한 useEffect
   useEffect(() => {
@@ -66,7 +60,7 @@ export function RestaurantsMap({
 
   // 2. 카카오맵 초기화
   useEffect(() => {
-    console.log("RestaurantsMap effect running with:", {
+    console.log("InitMap effect running with:", {
       isKakaoLoaded,
       isInitialized,
       renderCount,
@@ -92,13 +86,18 @@ export function RestaurantsMap({
           return
         }
 
-        const center = calculateCenter()
-        console.log("Initializing map with center:", center)
+        console.log("Attempting to create map with:", {
+          mapRef: !!mapRef.current,
+          dimensions: {
+            width: mapRef.current.clientWidth,
+            height: mapRef.current.clientHeight
+          }
+        })
 
         // 지도 초기화
         const options = {
           center: new window.kakao.maps.LatLng(center.lat, center.lng),
-          level: 5 // 더 넓은 영역 표시 (약 2km 범위)
+          level: level
         }
 
         // 맵이 존재하면 파괴
@@ -117,51 +116,29 @@ export function RestaurantsMap({
         console.log("Map created successfully in container")
         mapRef.current.__kakao_map = map
         setMapInstance(map)
-        
-        // 컨트롤 추가
-        const zoomControl = new window.kakao.maps.ZoomControl()
-        map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT)
-        
-        const mapTypeControl = new window.kakao.maps.MapTypeControl()
-        map.addControl(mapTypeControl, window.kakao.maps.ControlPosition.TOPRIGHT)
-        
+        setIsLoading(false)
+
         // 마커 추가
-        if (restaurants.length > 0) {
-          restaurants.forEach(restaurant => {
-            const position = new window.kakao.maps.LatLng(restaurant.latitude, restaurant.longitude)
-            
-            const marker = new window.kakao.maps.Marker({
-              position,
-              map: map
-            })
-            
-            const iwContent = `
-              <div style="padding:5px; width: 150px;">
-                <b>${restaurant.name}</b><br>
-                <span style="font-size: 12px; color: #888;">${restaurant.category} · 가격 ${restaurant.priceLevel}</span>
-              </div>
-            `
-            const infowindow = new window.kakao.maps.InfoWindow({
-              content: iwContent
-            })
-            
-            window.kakao.maps.event.addListener(marker, 'mouseover', function() {
-              infowindow.open(map, marker)
-            })
-            
-            window.kakao.maps.event.addListener(marker, 'mouseout', function() {
-              infowindow.close()
-            })
-            
-            if (onSelectRestaurant) {
-              window.kakao.maps.event.addListener(marker, 'click', function() {
-                onSelectRestaurant(restaurant.id)
+        if (markers.length > 0) {
+          markers.forEach((markerData) => {
+            const position = new window.kakao.maps.LatLng(
+              markerData.position.lat, 
+              markerData.position.lng
+            )
+            const marker = new window.kakao.maps.Marker({ position })
+            marker.setMap(map)
+
+            if (markerData.content) {
+              const infoWindow = new window.kakao.maps.InfoWindow({
+                content: markerData.content
+              })
+              window.kakao.maps.event.addListener(marker, "click", () => {
+                infoWindow.open(map, marker)
               })
             }
           })
-          console.log(`Added ${restaurants.length} markers successfully`)
         } else {
-          // 맛집이 없는 경우 공덕역 마커 추가
+          // 마커가 없는 경우 기본 공덕역 마커 추가
           const gongdeokMarker = new window.kakao.maps.Marker({
             position: new window.kakao.maps.LatLng(GONGDEOK_STATION.lat, GONGDEOK_STATION.lng),
             map: map
@@ -170,70 +147,91 @@ export function RestaurantsMap({
           const infoContent = `
             <div style="padding:5px; width: 150px;">
               <b>공덕역</b><br>
-              <span style="font-size: 12px; color: #666;">맛집 찾기 시작 위치</span>
+              <span style="font-size: 12px; color: #666;">서울특별시 마포구</span>
             </div>
           `
           const infoWindow = new window.kakao.maps.InfoWindow({
             content: infoContent
           })
           
-          window.kakao.maps.event.addListener(gongdeokMarker, "mouseover", () => {
+          window.kakao.maps.event.addListener(gongdeokMarker, "click", () => {
             infoWindow.open(map, gongdeokMarker)
           })
-          
-          window.kakao.maps.event.addListener(gongdeokMarker, "mouseout", () => {
-            infoWindow.close()
-          })
         }
+
+        // 컨트롤 추가
+        const zoomControl = new window.kakao.maps.ZoomControl()
+        map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT)
+
+        const mapTypeControl = new window.kakao.maps.MapTypeControl()
+        map.addControl(mapTypeControl, window.kakao.maps.ControlPosition.TOPRIGHT)
 
         // 지도 크기 업데이트 트리거
         setTimeout(() => {
           map.relayout()
           map.setCenter(new window.kakao.maps.LatLng(center.lat, center.lng))
         }, 100)
-        
-        setIsLoading(false)
-        console.log("Map initialization completed")
+
+        // 콜백 호출
+        if (onMapLoad) {
+          onMapLoad(map)
+        }
       } catch (error) {
-        console.error("Kakao Map init error:", error)
+        console.error("Map initialization error:", error)
         setIsError(true)
         setIsLoading(false)
       }
     }, 500) // 지연 시간 500ms
 
     return () => clearTimeout(initMapTimer)
-  }, [isKakaoLoaded, isInitialized, renderCount, mapInstance, restaurants, onSelectRestaurant])
+  }, [isKakaoLoaded, isInitialized, renderCount, mapInstance, center, level, markers, onMapLoad])
 
-  // 윈도우 리사이즈 시 지도 크기 조정
+  // 3. center 변경 시 지도 중심점 업데이트
+  useEffect(() => {
+    if (!mapInstance) return
+
+    try {
+      const newCenter = new window.kakao.maps.LatLng(center.lat, center.lng)
+      mapInstance.setCenter(newCenter)
+    } catch (error) {
+      console.error("Error updating map center:", error)
+    }
+  }, [mapInstance, center])
+
+  // 4. 컴포넌트 언마운트 시 지도 정리
+  useEffect(() => {
+    return () => {
+      if (mapInstance) {
+        // 지도 인스턴스 정리 로직
+        setMapInstance(null)
+      }
+    }
+  }, [mapInstance])
+
+  // 5. 윈도우 리사이즈 시 지도 크기 조정
   useEffect(() => {
     if (!mapInstance) return
 
     const handleResize = () => {
       mapInstance.relayout()
-      const center = calculateCenter()
       mapInstance.setCenter(new window.kakao.maps.LatLng(center.lat, center.lng))
     }
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [mapInstance, restaurants])
+  }, [mapInstance, center])
 
   // 오류 화면
   if (isError) {
     return (
-      <div 
-        className="w-full rounded-md bg-gray-100 flex flex-col items-center justify-center p-4"
-        style={{ height }}
+      <div
+        className="flex flex-col items-center justify-center bg-gray-100 rounded-md"
+        style={{ width, height }}
       >
-        <MapPin className="h-8 w-8 text-gray-400 mb-2" />
-        <p className="text-gray-500 text-sm text-center mb-1">지도를 불러올 수 없습니다</p>
-        <p className="text-gray-500 text-xs text-center">
-          {restaurants.length > 0 
-            ? `${restaurants.length}개의 맛집 정보는 목록에서 확인할 수 있습니다` 
-            : "맛집 정보를 찾을 수 없습니다"}
-        </p>
-        <button 
-          className="mt-2 px-3 py-1 bg-indigo-500 text-white text-xs rounded hover:bg-indigo-600"
+        <MapPin className="w-8 h-8 text-gray-400 mb-2" />
+        <p className="text-gray-500 text-sm">지도를 불러올 수 없습니다</p>
+        <button
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           onClick={() => window.location.reload()}
         >
           다시 시도
@@ -246,7 +244,7 @@ export function RestaurantsMap({
   return (
     <div 
       className="relative rounded-md overflow-hidden border border-gray-200"
-      style={{ height }}
+      style={{ width, height }}
     >
       <div
         ref={mapRef}
