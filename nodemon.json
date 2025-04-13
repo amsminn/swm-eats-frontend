@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "styles/**/*.ts",
+    "styles/**/*.css",
+    "pages/**/*.ts",
+    "pages/**/*.tsx"
+  ],
+  "ext": "ts,tsx,js,jsx,json",
+  "exec": "next dev"
+} 
